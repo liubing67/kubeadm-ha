@@ -52,3 +52,39 @@ jobs:
             skopeo copy --all --dest-creds ${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }} \
             docker://$image docker://$new
           done
+
+          for tag in $(skopeo list-tags docker://k8s.gcr.io/kube-proxy | jq -r .Tags[] | grep -Ev 'alpha|beta|rc'); 
+          do
+            skopeo copy --all --dest-creds ${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }} \
+            docker://k8s.gcr.io/kube-proxy:${tag} docker://registry.cn-shanghai.aliyuncs.com/kubeadm-ha/kube-proxy:${tag}; 
+          done
+
+          for tag in $(skopeo list-tags docker://k8s.gcr.io/kube-controller-manager | jq -r .Tags[] | grep -Ev 'alpha|beta|rc|fda24638d51a48baa13c35337fcd4793'); 
+          do
+            skopeo copy --all --dest-creds ${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }} \
+            docker://k8s.gcr.io/kube-controller-manager:${tag} docker://registry.cn-shanghai.aliyuncs.com/kubeadm-ha/kube-controller-manager:${tag}; 
+          done
+
+          for tag in $(skopeo list-tags docker://k8s.gcr.io/kube-apiserver | jq -r .Tags[] | grep -Ev 'alpha|beta|rc|9680e782e08a1a1c94c656190011bd02'); 
+          do
+            skopeo copy --all --dest-creds ${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }} \
+            docker://k8s.gcr.io/kube-apiserver:${tag} docker://registry.cn-shanghai.aliyuncs.com/kubeadm-ha/kube-apiserver:${tag}; 
+          done
+
+          for tag in $(skopeo list-tags docker://k8s.gcr.io/kube-scheduler | jq -r .Tags[] | grep -Ev 'alpha|beta|rc|34d0b8f8b31e27937327961528739bc9'); 
+          do
+            skopeo copy --all --dest-creds ${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }} \
+            docker://k8s.gcr.io/kube-scheduler:${tag} docker://registry.cn-shanghai.aliyuncs.com/kubeadm-ha/kube-scheduler:${tag}; 
+          done
+
+          for tag in $(skopeo list-tags docker://k8s.gcr.io/coredns | jq -r .Tags[] | grep -v '__'); 
+          do
+            skopeo copy --all --dest-creds ${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }} \
+            docker://k8s.gcr.io/coredns:${tag} docker://registry.cn-shanghai.aliyuncs.com/kubeadm-ha/coredns:${tag}; 
+          done
+
+          for tag in $(skopeo list-tags docker://k8s.gcr.io/pause | jq -r .Tags[] | grep -E '^\d\.\d$'); 
+          do
+            skopeo copy --all --dest-creds ${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }} \
+            docker://k8s.gcr.io/pause:${tag} docker://registry.cn-shanghai.aliyuncs.com/kubeadm-ha/pause:${tag}; 
+          done
